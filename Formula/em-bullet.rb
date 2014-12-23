@@ -14,7 +14,7 @@ class EmBullet < Formula
     args = []
 
     args << "-DBUILD_DEMOS=OFF" << "-DBUILD_EXTRAS=OFF" << "-DBUILD_CPU_DEMOS=OFF" << "-DUSE_GLUT=OFF" << "-DUSE_GRAPHICAL_BENCHMARK=OFF"
-    args << "-DCMAKE_TOOLCHAIN_FILE=/usr/local/Cellar/emscripten/1.27.0/libexec/cmake/Modules/Platform/Emscripten.cmake"
+    args << "-DCMAKE_TOOLCHAIN_FILE=/usr/local/Cellar/emscripten/1.28.0/libexec/cmake/Modules/Platform/Emscripten.cmake"
 
     system "cmake", *args
     system "make"
