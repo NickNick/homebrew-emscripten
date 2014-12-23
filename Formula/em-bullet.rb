@@ -1,6 +1,6 @@
 require 'formula'
 
-class Bullet < Formula
+class EmBullet < Formula
   homepage 'http://bulletphysics.org/wordpress/'
   url 'https://bullet.googlecode.com/files/bullet-2.82-r2704.tgz'
   version '2.82'
@@ -8,48 +8,16 @@ class Bullet < Formula
   head 'http://bullet.googlecode.com/svn/trunk/'
 
   depends_on 'cmake' => :build
-
-  option :universal
-  option 'framework',        'Build Frameworks'
-  option 'shared',           'Build shared libraries'
-  option 'build-demo',       'Build demo applications'
-  option 'build-extra',      'Build extra library'
-  option 'double-precision', 'Use double precision'
+  depends_on 'emscripten' => :build
 
   def install
     args = []
 
-    if build.include? "framework"
-      args << "-DBUILD_SHARED_LIBS=ON" << "-DFRAMEWORK=ON"
-      args << "-DCMAKE_INSTALL_PREFIX=#{frameworks}"
-      args << "-DCMAKE_INSTALL_NAME_DIR=#{frameworks}"
-    else
-      args << "-DBUILD_SHARED_LIBS=ON" if build.include? "shared"
-      args << "-DCMAKE_INSTALL_PREFIX=#{prefix}"
-    end
-
-    if build.universal?
-      ENV.universal_binary
-      args << "-DCMAKE_OSX_ARCHITECTURES=#{Hardware::CPU.universal_archs.as_cmake_arch_flags}"
-    end
-
-    args << "-DUSE_DOUBLE_PRECISION=ON" if build.include? "double-precision"
-
-    args << "-DBUILD_DEMOS=OFF" unless build.include? "build-demo"
-
-    # Demos require extras, see:
-    # https://code.google.com/p/bullet/issues/detail?id=767&thanks=767&ts=1384333052
-    if build.include? "build-extra" or build.include? "build-demo"
-      args << "-DINSTALL_EXTRA_LIBS=ON"
-    else
-      args << "-DBUILD_EXTRAS=OFF"
-    end
+    args << "-DBUILD_DEMOS=OFF" << "-DBUILD_EXTRAS=OFF" << "-DBUILD_CPU_DEMOS=OFF" << "-DUSE_GLUT=OFF" << "-DUSE_GRAPHICAL_BENCHMARK=OFF"
+    args << "-DCMAKE_TOOLCHAIN_FILE=/usr/local/Cellar/emscripten/1.27.0/libexec/cmake/Modules/Platform/Emscripten.cmake"
 
     system "cmake", *args
     system "make"
     system "make install"
-
-    prefix.install 'Demos' if build.include? "build-demo"
-    prefix.install 'Extras' if build.include? "build-extra"
   end
 end
